@@ -1,0 +1,29 @@
+name: Build posts manifest
+
+on:
+  push:
+    paths:
+      - 'content/posts/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate content/posts/index.json
+        run: |
+          node -e "
+          const fs=require('fs'),p='content/posts';
+          if(!fs.existsSync(p)) process.exit(0);
+          const files=fs.readdirSync(p).filter(f=>f.endsWith('.md'));
+          const items=files.map(f=>{
+            const s=fs.readFileSync(`${p}/${f}`,'utf8');
+            const m=/^title:\\s*(.*)$/m.exec(s)?.[1]||f;
+            return { slug:f.replace(/\\.md$/, ''), title:m };
+          });
+          fs.writeFileSync('content/posts/index.json', JSON.stringify(items, null, 2));
+          "
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update posts manifest"
+

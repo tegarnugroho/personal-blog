@@ -206,7 +206,7 @@ declare global {
   export type { Component, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from '../../node_modules/vue'
   import('../../node_modules/vue')
   // @ts-ignore
-  export type { Post, GitHubFile } from '../../composables/usePosts'
+  export type { Post } from '../../composables/usePosts'
   import('../../composables/usePosts')
 }
 // for vue template auto import
