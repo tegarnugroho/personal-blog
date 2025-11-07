@@ -1,0 +1,47 @@
+local_backend: true
+
+backend:
+  name: github
+  repo: tegaranugroho/blog-repo
+  branch: main
+  site_domain: ${SITE_URL}
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+publish_mode: editorial_workflow
+
+collections:
+  - name: "posts"
+    label: "Posts"
+    folder: "content/posts"
+    create: true
+    slug: "{{year}}-{{month}}-{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Slug", name: "slug", widget: "string", required: false}
+      - {label: "Date", name: "date", widget: "datetime"}
+      - {label: "Excerpt", name: "excerpt", widget: "text", required: false}
+      - {label: "Tags", name: "tags", widget: "list", default: []}
+      - {label: "Featured Image", name: "hero", widget: "image", required: false}
+      - {label: "Draft", name: "_draft", widget: "boolean", default: false, required: false}
+      - {label: "Body", name: "body", widget: "markdown"}
+  - name: "pages"
+    label: "Pages"
+    folder: "content/pages"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Body", name: "body", widget: "markdown"}
+  - name: "settings"
+    label: "Site Settings"
+    files:
+      - file: "content/config/site.json"
+        label: "General Settings"
+        name: "site"
+        fields:
+          - {label: "Site Title", name: "title", widget: "string"}
+          - {label: "Description", name: "description", widget: "text"}
+          - {label: "Author", name: "author", widget: "string"}
+          - {label: "Theme Color", name: "primary", widget: "color"}
