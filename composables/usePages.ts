@@ -12,6 +12,25 @@ export const usePages = () => {
     }
   }
 
+  const fetchPageFromCdn = async (slug: string): Promise<PageContent> => {
+    const url = `https://cdn.jsdelivr.net/gh/tegarnugroho/personal-blog@main/content/pages/${slug}.md`
+    const content = await $fetch<string>(url)
+    const fm = /^---\n([\s\S]*?)\n---/m.exec(content)
+    const front: Record<string, any> = {}
+    if (fm) {
+      fm[1].split('\n').forEach((line: string) => {
+        const i = line.indexOf(':')
+        if (i > 0) {
+          const key = line.slice(0, i).trim()
+          const val = line.slice(i + 1).trim().replace(/^['\"]|['\"]$/g, '')
+          front[key] = val
+        }
+      })
+    }
+    const body = fm ? content.slice(fm[0].length).trim() : content
+    return { _path: `/pages/${slug}`, title: front.title || slug, body, _source: 'cdn' }
+  }
+
   const fetchAllPagesFromLocal = async (): Promise<PageContent[]> => {
     const localPages = await queryContent('/pages')
       .only(['_path', 'title', 'body'])
@@ -24,9 +43,17 @@ export const usePages = () => {
     })) as PageContent[]
   }
 
-  const fetchPage = async (slug: string): Promise<PageContent> => fetchPageFromLocal(slug)
+  const fetchPage = async (slug: string): Promise<PageContent> => {
+    try {
+      return await fetchPageFromLocal(slug)
+    } catch {
+      if (typeof window !== 'undefined') {
+        return await fetchPageFromCdn(slug)
+      }
+      throw new Error(`Page \"${slug}\" not found`)
+    }
+  }
   const fetchAllPages = async (): Promise<PageContent[]> => fetchAllPagesFromLocal()
 
   return { fetchPageFromLocal, fetchAllPagesFromLocal, fetchPage, fetchAllPages }
 }
-

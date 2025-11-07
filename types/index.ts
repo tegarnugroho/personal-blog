@@ -11,7 +11,7 @@ export interface Post {
     minutes: number
     text?: string
   }
-  _source?: 'github' | 'local'
+  _source?: 'github' | 'local' | 'cdn'
 }
 
 export interface GitHubFile {
@@ -33,7 +33,7 @@ export interface PageContent {
   _path: string
   title: string
   body: string
-  _source?: 'github' | 'local'
+  _source?: 'github' | 'local' | 'cdn'
 }
 
 export interface GitHubPost extends Post {

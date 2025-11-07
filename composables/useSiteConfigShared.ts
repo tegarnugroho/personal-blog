@@ -17,6 +17,21 @@ export const useSiteConfigShared = () => {
       } as SiteConfig
     } catch (err) {
       console.error('Failed to load local site config:', err)
+      // Client-side CDN fallback via jsDelivr if available
+      if (typeof window !== 'undefined') {
+        try {
+          const cdn = await $fetch<any>('https://cdn.jsdelivr.net/gh/tegarnugroho/personal-blog@main/content/config/site.json')
+          return {
+            title: cdn.title || config.siteTitle || 'My Blog',
+            description: cdn.description || config.siteDescription || 'Thoughts on coding, tech, and life.',
+            author: cdn.author || 'Your Name',
+            primary: cdn.primary || '#3b82f6',
+            _source: 'cdn' as const
+          } as SiteConfig
+        } catch (e) {
+          console.warn('CDN site config fallback failed:', e)
+        }
+      }
       return {
         title: config.siteTitle || 'My Blog',
         description: config.siteDescription || 'Thoughts on coding, tech, and life.',
