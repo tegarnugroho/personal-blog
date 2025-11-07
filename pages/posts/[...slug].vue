@@ -27,58 +27,59 @@ const route = useRoute()
 const config = useRuntimeConfig().public
 const slug = computed(() => route.path.split('/').pop() || '')
 
-const { data: post } = await useAsyncData(`post:${route.path}`, async (): Promise<Post | null> => {
-  // Try local first
-  const localPost = await queryContent('/posts').where({ _path: route.path }).findOne()
-  if (localPost) {
-    return { ...(localPost as any), _path: localPost._path || route.path, _source: 'local' }
+const key = `post:${route.path}`
+const { data: post } = await useAsyncData(key, async (): Promise<Post | null> => {
+  if (!slug.value) return null
+  // Client: CDN-first for freshest content
+  if (process.client) {
+    try {
+      const { load: loadCdnVersion } = useCdnVersion()
+      const v = await loadCdnVersion()
+      const cdnUrl = `https://cdn.jsdelivr.net/gh/tegarnugroho/personal-blog@${v}/content/posts/${slug.value}.md`
+      const content = await $fetch<string>(cdnUrl)
+      const fm = /^---\n([\s\S]*?)\n---/m.exec(content)
+      const front: Record<string, any> = {}
+      if (fm) {
+        fm[1].split('\n').forEach((line: string) => {
+          const i = line.indexOf(':')
+          if (i > 0) {
+            const key = line.slice(0, i).trim()
+            const val = line.slice(i + 1).trim().replace(/^['\"]|['\"]$/g, '')
+            if (val.startsWith('[') && val.endsWith(']')) {
+              front[key] = val.slice(1, -1).split(',').map(v => v.trim().replace(/['\"]/g, '')).filter(Boolean)
+            } else if (val === 'true' || val === 'false') {
+              front[key] = val === 'true'
+            } else {
+              front[key] = val
+            }
+          }
+        })
+      }
+      const body = fm ? content.slice(fm[0].length).trim() : content
+      const words = body.split(/\s+/).filter(Boolean).length
+      return {
+        _path: route.path,
+        title: front.title || slug.value,
+        date: front.date || new Date().toISOString(),
+        excerpt: front.excerpt,
+        tags: front.tags || [],
+        hero: front.hero,
+        _draft: front._draft || false,
+        body,
+        readingTime: { minutes: Math.max(1, Math.ceil(words / 200)), text: `${Math.max(1, Math.ceil(words / 200))} min read` },
+        _source: 'cdn'
+      }
+    } catch (e) {
+      console.warn('CDN fetch failed, falling back to local:', e)
+      // fall through to local below
+    }
   }
 
-  // Fallback to CDN raw markdown (jsDelivr, client-side) with commit SHA to bypass cache
-  if (!slug.value || process.server) return null
-  try {
-    const { load: loadCdnVersion } = useCdnVersion()
-    const v = await loadCdnVersion()
-    const cdnUrl = `https://cdn.jsdelivr.net/gh/tegarnugroho/personal-blog@${v}/content/posts/${slug.value}.md`
-    const content = await $fetch<string>(cdnUrl)
-    // Parse frontmatter
-    const fm = /^---\n([\s\S]*?)\n---/m.exec(content)
-    const front: Record<string, any> = {}
-    if (fm) {
-      fm[1].split('\n').forEach((line: string) => {
-        const i = line.indexOf(':')
-        if (i > 0) {
-          const key = line.slice(0, i).trim()
-          const val = line.slice(i + 1).trim().replace(/^['\"]|['\"]$/g, '')
-          if (val.startsWith('[') && val.endsWith(']')) {
-            front[key] = val.slice(1, -1).split(',').map(v => v.trim().replace(/['\"]/g, '')).filter(Boolean)
-          } else if (val === 'true' || val === 'false') {
-            front[key] = val === 'true'
-          } else {
-            front[key] = val
-          }
-        }
-      })
-    }
-    const body = fm ? content.slice(fm[0].length).trim() : content
-    const words = body.split(/\s+/).filter(Boolean).length
-    return {
-      _path: route.path,
-      title: front.title || slug.value,
-      date: front.date || new Date().toISOString(),
-      excerpt: front.excerpt,
-      tags: front.tags || [],
-      hero: front.hero,
-      _draft: front._draft || false,
-      body,
-      readingTime: { minutes: Math.max(1, Math.ceil(words / 200)), text: `${Math.max(1, Math.ceil(words / 200))} min read` },
-      _source: 'cdn'
-    }
-  } catch (e) {
-    console.error('Failed to fetch CDN post:', e)
-    return null
-  }
-})
+  // SSR or CDN failed: use local content
+  const localPost = await queryContent('/posts').where({ _path: route.path }).findOne()
+  if (!localPost) return null
+  return { ...(localPost as any), _path: (localPost as any)._path || route.path, _source: 'local' }
+}, { server: false })
 
 const formattedDate = computed(() => post.value?.date ? new Date(post.value.date).toLocaleDateString() : '')
 const canonicalUrl = computed(() => `${config.siteUrl}${route.fullPath}`)
