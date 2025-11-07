@@ -13,11 +13,13 @@ useHead({
 })
 
 const config = useRuntimeConfig().public
+const { siteConfig } = useSiteConfigShared()
+
 useSeoMeta({
-  titleTemplate: (chunk) => chunk ? `${chunk} · ${config.siteTitle}` : config.siteTitle,
-  ogSiteName: config.siteTitle,
-  description: config.siteDescription,
-  ogDescription: config.siteDescription,
+  titleTemplate: (chunk) => chunk ? `${chunk} · ${siteConfig.value?.title || config.siteTitle}` : (siteConfig.value?.title || config.siteTitle),
+  ogSiteName: siteConfig.value?.title || config.siteTitle,
+  description: siteConfig.value?.description || config.siteDescription,
+  ogDescription: siteConfig.value?.description || config.siteDescription,
 })
 </script>
 

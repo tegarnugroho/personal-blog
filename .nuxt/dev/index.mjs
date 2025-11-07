@@ -677,7 +677,7 @@ const _inlineRuntimeConfig = {
         "headers": {
           "Content-Type": "text/xml; charset=UTF-8",
           "Cache-Control": "public, max-age=600, must-revalidate",
-          "X-Sitemap-Prerendered": "2025-11-07T06:22:56.778Z"
+          "X-Sitemap-Prerendered": "2025-11-07T06:30:28.192Z"
         }
       },
       "/_nuxt/builds/meta/**": {
@@ -6834,9 +6834,33 @@ const sitemapUrls_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineP
   default: sitemapUrls_get
 }, Symbol.toStringTag, { value: 'Module' }));
 
+const fetchSiteConfigFromGitHub = async () => {
+  try {
+    const fileResponse = await $fetch(
+      "https://api.github.com/repos/tegarnugroho/personal-blog/contents/content/config/site.json",
+      {
+        headers: {
+          "Accept": "application/vnd.github.v3+json",
+          "User-Agent": "personal-blog"
+        }
+      }
+    );
+    if (!fileResponse || !fileResponse.download_url) {
+      throw new Error("Site config not found on GitHub");
+    }
+    const content = await $fetch(fileResponse.download_url);
+    return JSON.parse(content);
+  } catch (error) {
+    console.warn("Failed to fetch site config from GitHub for RSS feed, using defaults");
+    return null;
+  }
+};
 const feed_xml = defineEventHandler(async (event) => {
   const cfg = useRuntimeConfig(event).public;
   const siteUrl = cfg.siteUrl || "http://localhost:3000";
+  const siteConfig = await fetchSiteConfigFromGitHub();
+  const title = (siteConfig == null ? void 0 : siteConfig.title) || cfg.siteTitle || "My Blog";
+  const description = (siteConfig == null ? void 0 : siteConfig.description) || cfg.siteDescription || "";
   const items = await serverQueryContent(event, "posts").where({ _draft: { $ne: true } }).sort({ date: -1 }).limit(30).find();
   const escaped = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const feedItems = items.map((p) => `
@@ -6851,9 +6875,9 @@ const feed_xml = defineEventHandler(async (event) => {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
     <channel>
-      <title>${escaped(cfg.siteTitle || "My Blog")}</title>
+      <title>${escaped(title)}</title>
       <link>${siteUrl}</link>
-      <description>${escaped(cfg.siteDescription || "")}</description>
+      <description>${escaped(description)}</description>
       ${feedItems}
     </channel>
   </rss>`;

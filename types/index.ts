@@ -21,6 +21,14 @@ export interface GitHubFile {
   type: string
 }
 
+export interface SiteConfig {
+  title: string
+  description: string
+  author: string
+  primary: string
+  _source?: 'github' | 'local' | 'fallback'
+}
+
 export interface GitHubPost extends Post {
   _source: 'github'
 }
