@@ -2,6 +2,7 @@
 title: Hi nama saya tegar
 date: 2025-11-07T13:06:00.000+07:00
 tags: []
+hero: /uploads/aespa-pubg-karina-ningning-winter-giselle-4k-wallpaper-uhdpaper.com-652-5-f.jpg
 _draft: false
 ---
 
