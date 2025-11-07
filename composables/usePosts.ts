@@ -87,13 +87,20 @@ export const usePosts = () => {
               ? content.slice(frontmatterMatch[0].length).trim()
               : content
 
+            // Convert relative image paths to GitHub raw URLs
+            const hero = frontmatter.hero 
+              ? frontmatter.hero.startsWith('http') 
+                ? frontmatter.hero 
+                : `https://raw.githubusercontent.com/tegarnugroho/personal-blog/main/public${frontmatter.hero}`
+              : undefined
+
             const post: Post = {
               _path: `/posts/${file.name.replace('.md', '')}`,
               title: frontmatter.title || 'Untitled',
               date: frontmatter.date || new Date().toISOString(),
               excerpt: frontmatter.excerpt,
               tags: frontmatter.tags || [],
-              hero: frontmatter.hero,
+              hero,
               _draft: frontmatter._draft || false,
               body,
               readingTime: { minutes: Math.ceil(body.split(' ').length / 200) },

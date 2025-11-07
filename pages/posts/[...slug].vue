@@ -103,13 +103,20 @@ const fetchFromGitHub = async (): Promise<Post> => {
       ? content.slice(frontmatterMatch[0].length).trim()
       : content
 
+    // Convert relative image paths to GitHub raw URLs
+    const hero = frontmatter.hero 
+      ? frontmatter.hero.startsWith('http') 
+        ? frontmatter.hero 
+        : `https://raw.githubusercontent.com/tegarnugroho/personal-blog/main/public${frontmatter.hero}`
+      : undefined
+
     const post: Post = {
       _path: route.path,
       title: frontmatter.title || 'Untitled',
       date: frontmatter.date || new Date().toISOString(),
       excerpt: frontmatter.excerpt,
       tags: frontmatter.tags || [],
-      hero: frontmatter.hero,
+      hero,
       _draft: frontmatter._draft || false,
       body,
       readingTime: { 
@@ -190,6 +197,14 @@ const renderedContent = computed(() => {
   
   // Basic markdown to HTML conversion
   let html = bodyContent
+  
+  // Convert relative image paths to GitHub raw URLs in markdown
+  html = html.replace(/!\[([^\]]*)\]\(([^)]*)\)/gim, (match, alt, src) => {
+    const fullSrc = src.startsWith('http') 
+      ? src 
+      : `https://raw.githubusercontent.com/tegarnugroho/personal-blog/main/public${src}`
+    return `<img src="${fullSrc}" alt="${alt}" class="rounded-md my-4 max-w-full" />`
+  })
   
   // Headers
   html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>')
