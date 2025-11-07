@@ -14,6 +14,7 @@ type HydrationStrategies = {
 type LazyComponent<T> = DefineComponent<HydrationStrategies, {}, {}, {}, {}, {}, {}, { hydrated: () => void }> & T
 
 interface _GlobalComponents {
+  'GlobalLoading': typeof import("../../components/GlobalLoading.vue")['default']
   'Pagination': typeof import("../../components/Pagination.vue")['default']
   'PostCard': typeof import("../../components/PostCard.vue")['default']
   'ShareButtons': typeof import("../../components/ShareButtons.vue")['default']
@@ -85,6 +86,7 @@ interface _GlobalComponents {
   'Html': typeof import("../../node_modules/nuxt/dist/head/runtime/components")['Html']
   'Body': typeof import("../../node_modules/nuxt/dist/head/runtime/components")['Body']
   'NuxtIsland': typeof import("../../node_modules/nuxt/dist/app/components/nuxt-island")['default']
+  'LazyGlobalLoading': LazyComponent<typeof import("../../components/GlobalLoading.vue")['default']>
   'LazyPagination': LazyComponent<typeof import("../../components/Pagination.vue")['default']>
   'LazyPostCard': LazyComponent<typeof import("../../components/PostCard.vue")['default']>
   'LazyShareButtons': LazyComponent<typeof import("../../components/ShareButtons.vue")['default']>

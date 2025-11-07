@@ -1,11 +1,20 @@
 <template>
-  <article v-if="post" class="prose prose-lg dark:prose-invert max-w-none">
+  <article v-if="post" class="prose prose-lg dark:prose-invert max-w-3xl mx-auto">
+    <div class="not-prose mb-4">
+      <NuxtLink to="/" class="text-sm text-slate-500 dark:text-slate-400 hover:underline">← Back to Home</NuxtLink>
+    </div>
     <h1 class="!mb-2 text-3xl sm:text-4xl font-extrabold tracking-tight">{{ post.title }}</h1>
-    <p class="not-prose text-sm text-slate-500 dark:text-slate-400">
+    <p class="not-prose mt-1 text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
       <time :datetime="post.date">{{ formattedDate }}</time>
-      <span v-if="post.readingTime"> · {{ post.readingTime.text || `${post.readingTime.minutes} min read` }}</span>
+      <span aria-hidden="true">•</span>
+      <span v-if="post.readingTime">{{ post.readingTime.text || `${post.readingTime.minutes} min read` }}</span>
     </p>
-    <img v-if="post.hero" :src="post.hero" :alt="post.title" class="rounded-md w-full my-4" />
+    <figure v-if="post.hero" class="not-prose my-5 mx-auto max-w-3xl">
+      <div class="w-full aspect-[16/9] max-h-[420px] overflow-hidden rounded-lg shadow-sm">
+        <img :src="post.hero" :alt="post.title" class="h-full w-full object-cover" />
+      </div>
+    </figure>
+    <hr class="my-8" />
     <ContentRenderer v-if="post._source !== 'cdn'" :value="post" />
     <div v-else class="prose dark:prose-invert" v-html="renderedContent"></div>
 
@@ -25,9 +34,10 @@ import type { Post } from '~/types'
 
 const route = useRoute()
 const config = useRuntimeConfig().public
+definePageMeta({ key: (route) => route.fullPath })
 const slug = computed(() => route.path.split('/').pop() || '')
 
-const key = `post:${route.path}`
+const key = computed(() => `post:${route.path}`)
 const { data: post } = await useAsyncData(key, async (): Promise<Post | null> => {
   if (!slug.value) return null
   // Client: CDN-first for freshest content
@@ -79,7 +89,7 @@ const { data: post } = await useAsyncData(key, async (): Promise<Post | null> =>
   const localPost = await queryContent('/posts').where({ _path: route.path }).findOne()
   if (!localPost) return null
   return { ...(localPost as any), _path: (localPost as any)._path || route.path, _source: 'local' }
-}, { server: false })
+}, { server: false, watch: [() => route.path] })
 
 const formattedDate = computed(() => post.value?.date ? new Date(post.value.date).toLocaleDateString() : '')
 const canonicalUrl = computed(() => `${config.siteUrl}${route.fullPath}`)
@@ -93,14 +103,14 @@ useSeoMeta({
   twitterCard: 'summary_large_image'
 })
 
-// Basic markdown → HTML for CDN fallback
+// Basic markdown -> HTML for CDN fallback (lightweight)
 const renderedContent = computed(() => {
   if (!post.value || post.value._source !== 'cdn') return ''
   let html = post.value.body
   if (typeof html !== 'string') return ''
-  // Images ![alt](src)
+  // Images
   html = html.replace(/!\[([^\]]*)\]\(([^)]*)\)/gim, (m, alt, src) => `<img src="${src}" alt="${alt}" class="rounded-md my-4 max-w-full" />`)
-  // Headers
+  // Headings
   html = html.replace(/^### (.*)$/gim, '<h3>$1</h3>')
   html = html.replace(/^## (.*)$/gim, '<h2>$1</h2>')
   html = html.replace(/^# (.*)$/gim, '<h1>$1</h1>')
@@ -111,13 +121,15 @@ const renderedContent = computed(() => {
   html = html.replace(/```(\w*)\n([\s\S]*?)\n```/gim, '<pre><code class="language-$1">$2</code></pre>')
   // Inline code
   html = html.replace(/`([^`]*)`/gim, '<code>$1</code>')
-  // Links [text](url)
+  // Links
   html = html.replace(/\[([^\]]*)\]\(([^\)]*)\)/gim, '<a href="$2" target="_blank" rel="noopener">$1</a>')
   // Lists
   html = html.replace(/^(?:\*|-) (.*)$/gim, '<li>$1</li>')
-  html = html.replace(/(<li>.*<\/li>)(?![\s\S]*<li>)/s, '<ul>$1</ul>')
+  html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
   // Line breaks
   html = html.replace(/\n/g, '<br>')
   return html
 })
 </script>
+
+

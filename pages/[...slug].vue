@@ -25,6 +25,7 @@
 import type { PageContent } from '~/types'
 
 const route = useRoute()
+definePageMeta({ key: (route) => route.fullPath })
 const { fetchPage } = usePages()
 const error = ref<string | null>(null)
 
@@ -35,7 +36,8 @@ const slug = computed(() => {
 })
 
 // Fetch page content with GitHub API fallback
-const { data: pageContent } = await useAsyncData(`page:${route.path}`, async (): Promise<PageContent | null> => {
+const pageKey = computed(() => `page:${route.path}`)
+const { data: pageContent } = await useAsyncData(pageKey, async (): Promise<PageContent | null> => {
   try {
     return await fetchPage(slug.value)
   } catch (err: any) {
@@ -43,7 +45,7 @@ const { data: pageContent } = await useAsyncData(`page:${route.path}`, async ():
     error.value = `Failed to load page: ${err.message}`
     return null
   }
-})
+}, { watch: [() => route.path] })
 
 // Simple markdown renderer for GitHub content
 const renderedContent = computed(() => {
