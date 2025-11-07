@@ -24,15 +24,23 @@
 <script setup lang="ts">
 import type { PageContent } from '~/types'
 
+const route = useRoute()
 const { fetchPage } = usePages()
 const error = ref<string | null>(null)
 
+// Extract slug from route
+const slug = computed(() => {
+  const pathParts = route.path.split('/')
+  return pathParts[pathParts.length - 1]
+})
+
 // Fetch page content with GitHub API fallback
-const { data: pageContent } = await useAsyncData('about-page', async (): Promise<PageContent | null> => {
+const { data: pageContent } = await useAsyncData(`page:${route.path}`, async (): Promise<PageContent | null> => {
   try {
-    return await fetchPage('about')
-  } catch (error) {
-    console.error('Failed to fetch about page:', error)
+    return await fetchPage(slug.value)
+  } catch (err: any) {
+    console.error(`Failed to fetch page "${slug.value}":`, err)
+    error.value = `Failed to load page: ${err.message}`
     return null
   }
 })
@@ -87,8 +95,7 @@ const renderedContent = computed(() => {
 
 // SEO Meta
 useSeoMeta({ 
-  title: pageContent.value?.title || 'About',
-  description: 'About page'
+  title: pageContent.value?.title || 'Page',
+  description: `${pageContent.value?.title || 'Page'} - Content page`
 })
 </script>
-

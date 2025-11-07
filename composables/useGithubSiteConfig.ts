@@ -41,18 +41,30 @@ export const useGithubSiteConfig = () => {
 
   // Function to fetch from local content
   const fetchFromLocal = async (): Promise<SiteConfig> => {
-    const localConfig = await queryContent('/config/site').findOne()
-    if (!localConfig) {
-      throw new Error('Site config not found locally')
-    }
-    
-    console.log('📁 Using local site config')
-    return {
-      title: localConfig.title || 'My Blog',
-      description: localConfig.description || 'Thoughts on coding, tech, and life.',
-      author: localConfig.author || 'Your Name',
-      primary: localConfig.primary || '#3b82f6',
-      _source: 'local'
+    try {
+      const localConfig = await queryContent('/config/site').findOne()
+      if (!localConfig) {
+        throw new Error('Site config not found locally')
+      }
+      
+      console.log('📁 Using local site config')
+      return {
+        title: localConfig.title || 'My Blog',
+        description: localConfig.description || 'Thoughts on coding, tech, and life.',
+        author: localConfig.author || 'Your Name',
+        primary: localConfig.primary || '#3b82f6',
+        _source: 'local'
+      }
+    } catch (error) {
+      console.error('Failed to fetch local site config:', error)
+      // Return default config if local also fails
+      return {
+        title: 'My Blog',
+        description: 'Thoughts on coding, tech, and life.',
+        author: 'Your Name',
+        primary: '#3b82f6',
+        _source: 'fallback'
+      }
     }
   }
 

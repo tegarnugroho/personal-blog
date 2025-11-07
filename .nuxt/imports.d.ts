@@ -31,6 +31,7 @@ export { setInterval } from '#app/compat/interval';
 export { definePageMeta } from '../node_modules/nuxt/dist/pages/runtime/composables';
 export { defineLazyHydrationComponent } from '#app/composables/lazy-hydration';
 export { useGithubSiteConfig } from '../composables/useGithubSiteConfig';
+export { usePages } from '../composables/usePages';
 export { usePosts, Post, GitHubFile } from '../composables/usePosts';
 export { useSiteConfigShared } from '../composables/useSiteConfigShared';
 export { fetchPostsFromGitHub } from '../utils/github-api';

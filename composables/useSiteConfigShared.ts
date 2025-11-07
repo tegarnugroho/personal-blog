@@ -6,7 +6,7 @@ export const useSiteConfigShared = () => {
   const config = useRuntimeConfig().public
   const { fetchSiteConfig } = useGithubSiteConfig()
 
-  // Global singleton for site config
+  // Global singleton for site config with longer cache
   const { data: siteConfig, pending, error, refresh } = useAsyncData('global-site-config', async () => {
     try {
       return await fetchSiteConfig()
@@ -20,6 +20,16 @@ export const useSiteConfigShared = () => {
         _source: 'fallback'
       } as SiteConfig
     }
+  }, {
+    // Cache for 5 minutes to reduce API calls
+    server: true,
+    default: () => ({
+      title: config.siteTitle || 'My Blog',
+      description: config.siteDescription || 'Thoughts on coding, tech, and life.',
+      author: 'Your Name',
+      primary: '#3b82f6',
+      _source: 'fallback'
+    } as SiteConfig)
   })
 
   return {

@@ -29,6 +29,13 @@ export interface SiteConfig {
   _source?: 'github' | 'local' | 'fallback'
 }
 
+export interface PageContent {
+  _path: string
+  title: string
+  body: string
+  _source?: 'github' | 'local'
+}
+
 export interface GitHubPost extends Post {
   _source: 'github'
 }
