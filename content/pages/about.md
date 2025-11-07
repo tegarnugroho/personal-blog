@@ -1,14 +1,12 @@
 ---
 title: About
 ---
+### Hi, I’m Tegar Nugroho
 
-Hi! I’m a developer who enjoys building tools and writing about code, product, and learning.
+I’m a Flutter developer focused on building accessible, high‑performance applications.
 
-This blog is:
+I favor clean architecture and maintainable code so every product feels smooth, consistent, and easy to evolve.
 
-- Built with **Nuxt 3 + Tailwind**
-- Content managed by **Decap CMS**
-- Deployed to **Cloudflare Pages** or **Netlify**
+I’ve shipped mobile, web, and desktop projects with a strong emphasis on performance, consistency, and scalability.
 
-Find me on [GitHub](https://github.com/).
-
+At Wolkk (remote), I build cross‑platform solutions that combine clear design with robust engineering.
