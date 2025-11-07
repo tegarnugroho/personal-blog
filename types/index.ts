@@ -6,7 +6,7 @@ export interface Post {
   tags: string[]
   hero?: string
   _draft?: boolean
-  body: string
+  body: any
   readingTime?: {
     minutes: number
     text?: string
@@ -32,7 +32,7 @@ export interface SiteConfig {
 export interface PageContent {
   _path: string
   title: string
-  body: string
+  body: any
   _source?: 'github' | 'local' | 'cdn'
 }
 

@@ -31,18 +31,7 @@ const { data: post } = await useAsyncData(`post:${route.path}`, async (): Promis
   // Try local first
   const localPost = await queryContent('/posts').where({ _path: route.path }).findOne()
   if (localPost) {
-    return {
-      _path: localPost._path || route.path,
-      title: localPost.title || 'Untitled',
-      date: localPost.date || new Date().toISOString(),
-      excerpt: typeof localPost.excerpt === 'string' ? localPost.excerpt : undefined,
-      tags: localPost.tags || [],
-      hero: localPost.hero,
-      _draft: localPost._draft || false,
-      body: typeof localPost.body === 'string' ? localPost.body : '',
-      readingTime: localPost.readingTime || { minutes: 1 },
-      _source: 'local'
-    }
+    return { ...(localPost as any), _path: localPost._path || route.path, _source: 'local' }
   }
 
   // Fallback to CDN raw markdown (jsDelivr)

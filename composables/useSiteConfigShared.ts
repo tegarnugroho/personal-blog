@@ -6,7 +6,7 @@ export const useSiteConfigShared = () => {
 
   const { data: siteConfig, pending, error, refresh } = useAsyncData('global-site-config', async () => {
     try {
-      const local = await queryContent('/config').findOne()
+      const local = await queryContent('/config/site').findOne()
       if (!local) throw new Error('site config missing')
       return {
         title: local.title || config.siteTitle || 'My Blog',
