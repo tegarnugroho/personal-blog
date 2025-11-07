@@ -34,10 +34,12 @@ const { data: post } = await useAsyncData(`post:${route.path}`, async (): Promis
     return { ...(localPost as any), _path: localPost._path || route.path, _source: 'local' }
   }
 
-  // Fallback to CDN raw markdown (jsDelivr)
-  if (!slug.value) return null
-  const cdnUrl = `https://cdn.jsdelivr.net/gh/tegarnugroho/personal-blog@main/content/posts/${slug.value}.md`
+  // Fallback to CDN raw markdown (jsDelivr, client-side) with commit SHA to bypass cache
+  if (!slug.value || process.server) return null
   try {
+    const { load: loadCdnVersion } = useCdnVersion()
+    const v = await loadCdnVersion()
+    const cdnUrl = `https://cdn.jsdelivr.net/gh/tegarnugroho/personal-blog@${v}/content/posts/${slug.value}.md`
     const content = await $fetch<string>(cdnUrl)
     // Parse frontmatter
     const fm = /^---\n([\s\S]*?)\n---/m.exec(content)

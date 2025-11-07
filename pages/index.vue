@@ -32,15 +32,22 @@ const { data: posts } = await useAsyncData('home-posts', async () => {
   }
 })
 
-// Try to fetch CDN manifest for ordering/freshness (no token, client-side)
-const cdnUrl = 'https://cdn.jsdelivr.net/gh/tegarnugroho/personal-blog@main/content/posts/index.json'
-const { data: manifest } = await useFetch<any[]>(cdnUrl, { key: 'posts-index', server: false, default: () => [] })
+// Try to fetch CDN manifest (client only) with commit SHA to bypass CDN cache
+const { load: loadCdnVersion } = useCdnVersion()
+const cdnUrl = ref('')
+if (process.client) {
+  loadCdnVersion().then(v => {
+    cdnUrl.value = `https://cdn.jsdelivr.net/gh/tegarnugroho/personal-blog@${v}/content/posts/index.json`
+  })
+}
+const { data: manifest, refresh: refreshManifest } = await useFetch<any[]>(cdnUrl, { key: 'posts-index', server: false, default: () => [], immediate: false })
+watch(cdnUrl, () => { if (cdnUrl.value) refreshManifest() })
 
 // Pagination
 const page = ref(Number(route.query.page || 1))
 watch(() => route.query.page, (p: any) => page.value = Number(p || 1))
 
-const totalPages = computed(() => Math.max(1, Math.ceil((posts.value?.length || 0) / PAGE_SIZE)))
+const totalPages = computed(() => Math.max(1, Math.ceil((displayed.value.length || 0) / PAGE_SIZE)))
 const displayed = computed(() => {
   const local = posts.value || []
   const idx = (manifest.value || [])

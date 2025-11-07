@@ -3,12 +3,14 @@ import type { Post } from '~/types'
 export const usePosts = () => {
   const fetchFromLocal = async (): Promise<Post[]> => {
     const localPosts = await queryContent('/posts')
-      .where({ _draft: { $ne: true } })
+      .where({ _draft: { $ne: true }, _path: { $ne: '/posts/index' } })
       .only(['_path', 'title', 'excerpt', 'date', 'tags', 'hero', 'readingTime', 'body'])
       .sort({ date: -1 })
       .find()
+    // Exclude directory index docs like '/posts' and any nested paths not matching '/posts/{slug}'
+    const filtered = (localPosts as any[]).filter(p => typeof p._path === 'string' && /^\/posts\/[^/]+$/.test(p._path))
 
-    return localPosts.map((post: any) => ({
+    return filtered.map((post: any) => ({
       ...post,
       _source: 'local' as const,
       tags: post.tags || [],
@@ -25,4 +27,3 @@ export const usePosts = () => {
 }
 
 export type { Post }
-
