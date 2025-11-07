@@ -44,7 +44,8 @@ body {
   .prose pre { @apply rounded-md border border-black/10 dark:border-white/10 !bg-black !bg-opacity-90 text-white overflow-x-auto; }
   .prose code { @apply px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10; }
   .prose hr { @apply border-black/10 dark:border-white/10; }
-  .prose img { @apply rounded-md shadow-sm mx-auto w-full; max-height: 480px; object-fit: contain; }
+  /* Images should not dictate page width; keep within container */
+  .prose img { @apply rounded-md shadow-sm mx-auto max-w-full h-auto; max-height: 480px; object-fit: contain; }
   .prose table { @apply w-full border-collapse; }
   .prose thead th { @apply border-b border-black/10 dark:border-white/10 pb-2; }
   .prose tbody td { @apply border-b border-black/5 dark:border-white/5 py-2; }

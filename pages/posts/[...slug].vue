@@ -1,5 +1,5 @@
 <template>
-  <article v-if="post" class="prose prose-lg dark:prose-invert max-w-3xl mx-auto">
+  <article v-if="post" class="prose prose-lg dark:prose-invert max-w-none mx-auto">
     <div class="not-prose mb-4">
       <NuxtLink to="/" class="text-sm text-slate-500 dark:text-slate-400 hover:underline">← Back to Home</NuxtLink>
     </div>
@@ -9,14 +9,14 @@
       <span aria-hidden="true">•</span>
       <span v-if="post.readingTime">{{ post.readingTime.text || `${post.readingTime.minutes} min read` }}</span>
     </p>
-    <figure v-if="post.hero" class="not-prose my-5 mx-auto max-w-3xl">
-      <div class="w-full aspect-[16/9] max-h-[420px] overflow-hidden rounded-lg shadow-sm">
+    <figure v-if="post.hero" class="not-prose my-5">
+      <div class="w-full aspect-[16/9] max-h-[560px] overflow-hidden rounded-lg shadow-sm">
         <img :src="post.hero" :alt="post.title" class="h-full w-full object-cover" />
       </div>
     </figure>
     <hr class="my-8" />
     <ContentRenderer v-if="post._source !== 'cdn'" :value="post" />
-    <div v-else class="prose dark:prose-invert" v-html="renderedContent"></div>
+    <div v-else v-html="renderedContent"></div>
 
     <div class="not-prose mt-10 flex items-center justify-between">
       <TagList :tags="post.tags || []" />
