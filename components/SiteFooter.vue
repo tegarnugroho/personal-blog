@@ -1,6 +1,6 @@
 <template>
-  <footer class="border-t border-slate-200 dark:border-slate-800">
-    <div class="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8 text-sm text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+  <footer class="border-t border-black/10 dark:border-white/10">
+    <div class="max-w-5xl mx-auto px-4 py-8 text-sm text-black/70 dark:text-white/70 flex flex-col sm:flex-row items-center justify-between gap-2">
       <div>
         © {{ new Date().getFullYear() }} {{ siteConfig?.author || 'Your Name' }} · Built with Nuxt + Decap CMS
       </div>
@@ -15,4 +15,3 @@
 <script setup lang="ts">
 const { siteConfig } = useSiteConfigShared()
 </script>
-

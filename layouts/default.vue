@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="min-h-screen flex flex-col font-sans">
     <SiteHeader />
-    <main class="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-10 flex-1">
+    <main class="max-w-5xl mx-auto px-4 py-10 flex-1">
       <slot />
     </main>
     <SiteFooter />
@@ -12,4 +12,3 @@
 <script setup lang="ts">
 // Layout wrapper with header/footer
 </script>
-

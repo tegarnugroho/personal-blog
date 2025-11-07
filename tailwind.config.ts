@@ -11,6 +11,19 @@ export default <Partial<Config>>({
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: [
+          'Inter',
+          'ui-sans-serif',
+          'system-ui',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica Neue',
+          'Arial',
+          'Noto Sans',
+          'sans-serif'
+        ]
+      },
       colors: {
         primary: {
           DEFAULT: '#4f46e5'
@@ -20,4 +33,3 @@ export default <Partial<Config>>({
   },
   plugins: [require('@tailwindcss/typography')]
 })
-

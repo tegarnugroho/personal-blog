@@ -7,7 +7,7 @@
   --fg: #0f172a;
 }
 .dark {
-  --bg: #0b1220;
+  --bg: #000000;
   --fg: #e2e8f0;
 }
 html, body, #__nuxt {
@@ -22,3 +22,27 @@ body {
   @apply rounded-md;
 }
 
+/* Devfolio-inspired theme utilities and components */
+@layer base {
+  html { @apply scroll-smooth; }
+  section[id] { scroll-margin-top: 56px; }
+  body { @apply transition-colors duration-300; }
+  ::selection { @apply bg-black text-white dark:bg-white dark:text-black; }
+}
+
+@layer components {
+  .btn { @apply inline-flex items-center gap-2 rounded border px-5 py-2 text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white; }
+  .btn-ghost { @apply btn border-black/20 dark:border-white/20 hover:-translate-y-0.5 hover:bg-black/5 dark:hover:bg-white/10 active:translate-y-0; }
+  .btn-solid { @apply btn border-black dark:border-white bg-black text-white dark:bg-white dark:text-black hover:-translate-y-0.5 active:translate-y-0; }
+  .card { @apply rounded border border-black/15 dark:border-white/15 bg-white/60 dark:bg-black/60 backdrop-blur-sm transition-transform duration-200 hover:-translate-y-1; }
+  .chip { @apply rounded border border-black/20 dark:border-white/20 px-3 py-1 text-xs transition-transform duration-200 hover:-translate-y-0.5 hover:bg-black/5 dark:hover:bg-white/10; }
+  .chip-s { @apply text-[11px] px-2 py-0.5; }
+  .chip-m { @apply text-xs px-3 py-1; }
+  .chip-l { @apply text-sm px-4 py-1.5 font-medium; }
+  .chip-dot { @apply relative pl-3; }
+}
+
+@layer utilities {
+  @keyframes grid-pan { from { background-position: 0px 0px, 0px 0px; } to { background-position: 28px 0px, 0px 28px; } }
+  .animate-grid-pan { animation: grid-pan 28s linear infinite; }
+}

@@ -44,4 +44,3 @@ const pagedPosts = computed(() => {
 
 useSeoMeta({ title: 'Home' })
 </script>
-

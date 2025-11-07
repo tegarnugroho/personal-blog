@@ -1,5 +1,5 @@
 <template>
-  <article class="group border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary transition-colors">
+  <article class="group card overflow-hidden">
     <NuxtLink :to="post._path">
       <img v-if="post.hero" :src="post.hero" :alt="post.title" loading="lazy" class="w-full h-48 object-cover">
       <div class="p-5">
