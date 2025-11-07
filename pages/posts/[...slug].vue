@@ -1,23 +1,5 @@
 <template>
   <article v-if="post" class="prose dark:prose-invert max-w-none">
-    <div class="not-prose mb-4 flex items-center justify-between">
-      <div class="flex items-center gap-2 text-sm">
-        <span v-if="dataSource === 'github'" class="text-green-600 dark:text-green-400 flex items-center gap-1">
-          🌐 Live from GitHub
-        </span>
-        <span v-else class="text-gray-600 dark:text-gray-400 flex items-center gap-1">
-          📁 Local content
-        </span>
-        <button 
-          @click="refreshFromGitHub" 
-          :disabled="isRefreshing"
-          class="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 disabled:opacity-50"
-        >
-          {{ isRefreshing ? 'Refreshing...' : 'Refresh' }}
-        </button>
-      </div>
-    </div>
-
     <h1>{{ post.title }}</h1>
     <p class="not-prose text-sm text-slate-500">
       <time :datetime="post.date">{{ formattedDate }}</time>
@@ -26,7 +8,7 @@
     <img v-if="post.hero" :src="post.hero" :alt="post.title" class="rounded-md w-full my-4" />
     
     <!-- Render content based on source -->
-    <ContentRenderer v-if="dataSource === 'local'" :value="post" />
+    <ContentRenderer v-if="post._source === 'local'" :value="post" />
     <div v-else class="content-from-github" v-html="renderedContent"></div>
 
     <div class="not-prose mt-8 flex items-center justify-between">
@@ -37,10 +19,10 @@
   <div v-else-if="error" class="text-center py-8">
     <p class="text-red-600 dark:text-red-400">{{ error }}</p>
     <button 
-      @click="refreshFromGitHub"
+      @click="$router.go(0)"
       class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
     >
-      Try Again
+      Refresh Page
     </button>
   </div>
   <div v-else class="text-center py-8">
@@ -50,10 +32,10 @@
 </template>
 
 <script setup lang="ts">
+import type { Post } from '~/types'
+
 const route = useRoute()
 const config = useRuntimeConfig().public
-const isRefreshing = ref(false)
-const dataSource = ref<'github' | 'local'>('local')
 const error = ref<string | null>(null)
 
 // Extract slug from route
@@ -63,7 +45,7 @@ const slug = computed(() => {
 })
 
 // Function to fetch post from GitHub API
-const fetchFromGitHub = async () => {
+const fetchFromGitHub = async (): Promise<Post> => {
   try {
     console.log(`🔄 Fetching post "${slug.value}" from GitHub API...`)
     
@@ -77,7 +59,7 @@ const fetchFromGitHub = async () => {
           'User-Agent': 'personal-blog'
         }
       }
-    )
+    ) as any
 
     if (!fileResponse || !fileResponse.download_url) {
       throw new Error('Post not found on GitHub')
@@ -121,7 +103,7 @@ const fetchFromGitHub = async () => {
       ? content.slice(frontmatterMatch[0].length).trim()
       : content
 
-    const post = {
+    const post: Post = {
       _path: route.path,
       title: frontmatter.title || 'Untitled',
       date: frontmatter.date || new Date().toISOString(),
@@ -138,7 +120,6 @@ const fetchFromGitHub = async () => {
     }
 
     console.log(`✅ Successfully fetched post "${slug.value}" from GitHub`)
-    dataSource.value = 'github'
     error.value = null
     return post
 
@@ -150,19 +131,33 @@ const fetchFromGitHub = async () => {
 }
 
 // Function to fetch from local content
-const fetchFromLocal = async () => {
+const fetchFromLocal = async (): Promise<Post> => {
   const localPost = await queryContent('/posts').where({ _path: route.path }).findOne()
   if (!localPost) {
     throw new Error('Post not found locally')
   }
   
-  dataSource.value = 'local'
   console.log(`📁 Using local content for post "${slug.value}"`)
-  return { ...localPost, _source: 'local' }
+  
+  // Convert to our Post type
+  const post: Post = {
+    _path: localPost._path || route.path,
+    title: localPost.title || 'Untitled',
+    date: localPost.date || new Date().toISOString(),
+    excerpt: typeof localPost.excerpt === 'string' ? localPost.excerpt : undefined,
+    tags: localPost.tags || [],
+    hero: localPost.hero,
+    _draft: localPost._draft || false,
+    body: typeof localPost.body === 'string' ? localPost.body : '',
+    readingTime: localPost.readingTime || { minutes: 1 },
+    _source: 'local'
+  }
+  
+  return post
 }
 
 // Main data fetching with fallback
-const { data: post, refresh } = await useAsyncData(`post:${route.path}`, async () => {
+const { data: post } = await useAsyncData(`post:${route.path}`, async (): Promise<Post | null> => {
   try {
     // Try GitHub API first
     return await fetchFromGitHub()
@@ -179,15 +174,22 @@ const { data: post, refresh } = await useAsyncData(`post:${route.path}`, async (
 })
 
 // Computed properties
-const formattedDate = computed(() => post.value?.date ? new Date(post.value.date).toLocaleDateString() : '')
+const formattedDate = computed(() => {
+  if (!post.value?.date) return ''
+  return new Date(post.value.date).toLocaleDateString()
+})
+
 const canonicalUrl = computed(() => `${config.siteUrl}${route.fullPath}`)
 
 // Simple markdown renderer for GitHub content
 const renderedContent = computed(() => {
-  if (!post.value || dataSource.value === 'local') return ''
+  if (!post.value || post.value._source === 'local') return ''
+  
+  const bodyContent = post.value.body
+  if (typeof bodyContent !== 'string') return ''
   
   // Basic markdown to HTML conversion
-  let html = post.value.body
+  let html = bodyContent
   
   // Headers
   html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>')
@@ -218,16 +220,6 @@ const renderedContent = computed(() => {
   
   return html
 })
-
-// Manual refresh function
-const refreshFromGitHub = async () => {
-  isRefreshing.value = true
-  try {
-    await refresh()
-  } finally {
-    isRefreshing.value = false
-  }
-}
 
 // SEO Meta
 useSeoMeta({

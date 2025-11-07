@@ -25,4 +25,3 @@ Features:
 - Dark/light theme toggle and responsive design
 
 Stay tuned for more posts about code, tools, and learning!
-

@@ -1,5 +1,10 @@
+import { defineNuxtConfig } from "nuxt/config";
+
 // Nuxt 3 configuration for a static blog with @nuxt/content and Decap CMS
 export default defineNuxtConfig({
+  // Add compatibility date for latest features
+  compatibilityDate: '2025-11-07',
+  
   modules: [
     '@nuxt/content',
     '@nuxtjs/tailwindcss',
@@ -8,6 +13,15 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode'
   ],
   css: ['~/assets/css/tailwind.css'],
+  
+  // PostCSS configuration for Tailwind
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
+  
   app: {
     head: {
       htmlAttrs: { lang: 'en' },
@@ -41,9 +55,8 @@ export default defineNuxtConfig({
     preference: 'system',
     fallback: 'light'
   },
-  // Sitemap using server-provided route list
+  // Sitemap configuration
   sitemap: {
-    siteUrl: process.env.SITE_URL,
     sources: ['/api/sitemap-urls']
   },
   nitro: {
