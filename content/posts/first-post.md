@@ -1,9 +1,12 @@
 ---
-title: "Hello, Nuxt + Decap!"
+title: Hello, Nuxt + Decap!
 date: 2024-01-05
-excerpt: "A fresh start for my personal blog, powered by Nuxt 3, Tailwind, and Decap CMS."
-tags: [nuxt, decap, jamstack]
-hero: "/uploads/hero-sample.jpg"
+excerpt: A fresh start for my personal blog, powered by Nuxt 3, Tailwind, and Decap CMS.
+tags:
+  - nuxt
+  - decap
+  - jamstack
+hero: /uploads/vscode-banner.png
 ---
 
 Welcome to my blog! This site is built with **Nuxt 3** and **Tailwind CSS**, with content managed in Git via **Decap CMS** (formerly Netlify CMS).
