@@ -253,6 +253,8 @@ declare module 'nuxt/schema' {
             dark: string,
          },
 
+         preload: Array<string>,
+
          highlighter: string,
 
          shikiEngine: string,
@@ -581,6 +583,8 @@ declare module 'nuxt/schema' {
 
             dark: string,
          },
+
+         preload: Array<string>,
 
          highlighter: string,
 

@@ -15,7 +15,7 @@
       </div>
     </figure>
     <hr class="my-8" />
-    <ContentRenderer v-if="post._source !== 'cdn'" :value="post" />
+    <ContentDoc v-if="post._source !== 'cdn'" :path="route.path" />
     <div v-else v-html="renderedContent"></div>
 
     <div class="not-prose mt-10 flex items-center justify-between">
@@ -40,7 +40,15 @@ const slug = computed(() => route.path.split('/').pop() || '')
 const key = computed(() => `post:${route.path}`)
 const { data: post } = await useAsyncData(key, async (): Promise<Post | null> => {
   if (!slug.value) return null
-  // Client: CDN-first for freshest content
+  // Local first for proper highlighting via <ContentDoc>
+  const localPost = await queryContent('/posts').where({ _path: route.path }).findOne()
+  const body = (localPost as any)?.body
+  const hasLocal = Boolean(localPost) && (typeof body !== 'string' || body.trim() !== '')
+  if (hasLocal) {
+    return { ...(localPost as any), _path: (localPost as any)._path || route.path, _source: 'local' }
+  }
+
+  // Fallback to CDN (client only)
   if (process.client) {
     try {
       const { load: loadCdnVersion } = useCdnVersion()
@@ -53,20 +61,20 @@ const { data: post } = await useAsyncData(key, async (): Promise<Post | null> =>
         fm[1].split('\n').forEach((line: string) => {
           const i = line.indexOf(':')
           if (i > 0) {
-            const key = line.slice(0, i).trim()
+            const k = line.slice(0, i).trim()
             const val = line.slice(i + 1).trim().replace(/^['\"]|['\"]$/g, '')
             if (val.startsWith('[') && val.endsWith(']')) {
-              front[key] = val.slice(1, -1).split(',').map(v => v.trim().replace(/['\"]/g, '')).filter(Boolean)
+              front[k] = val.slice(1, -1).split(',').map(v => v.trim().replace(/['\"]/g, '')).filter(Boolean)
             } else if (val === 'true' || val === 'false') {
-              front[key] = val === 'true'
+              front[k] = val === 'true'
             } else {
-              front[key] = val
+              front[k] = val
             }
           }
         })
       }
-      const body = fm ? content.slice(fm[0].length).trim() : content
-      const words = body.split(/\s+/).filter(Boolean).length
+      const bodyStr = fm ? content.slice(fm[0].length).trim() : content
+      const words = bodyStr.split(/\s+/).filter(Boolean).length
       return {
         _path: route.path,
         title: front.title || slug.value,
@@ -75,20 +83,15 @@ const { data: post } = await useAsyncData(key, async (): Promise<Post | null> =>
         tags: front.tags || [],
         hero: front.hero,
         _draft: front._draft || false,
-        body,
+        body: bodyStr,
         readingTime: { minutes: Math.max(1, Math.ceil(words / 200)), text: `${Math.max(1, Math.ceil(words / 200))} min read` },
         _source: 'cdn'
       }
     } catch (e) {
-      console.warn('CDN fetch failed, falling back to local:', e)
-      // fall through to local below
+      console.warn('CDN fetch failed and no local content:', e)
     }
   }
-
-  // SSR or CDN failed: use local content
-  const localPost = await queryContent('/posts').where({ _path: route.path }).findOne()
-  if (!localPost) return null
-  return { ...(localPost as any), _path: (localPost as any)._path || route.path, _source: 'local' }
+  return null
 }, { server: false, watch: [() => route.path] })
 
 const formattedDate = computed(() => post.value?.date ? new Date(post.value.date).toLocaleDateString() : '')

@@ -44,7 +44,8 @@ export default defineNuxtConfig({
       theme: {
         default: 'github-light',
         dark: 'github-dark'
-      }
+      },
+      preload: ['ts','js','json','bash','html','css','vue','md']
     }
   },
   // @nuxt/image: use default local provider; good with static hosting

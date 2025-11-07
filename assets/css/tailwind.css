@@ -41,8 +41,10 @@ body {
   .prose li { @apply my-1; }
   .prose a { @apply underline decoration-1 underline-offset-2 hover:decoration-2 transition-colors; }
   .prose blockquote { @apply border-l-4 border-black/20 dark:border-white/20 pl-4 italic bg-black/5 dark:bg-white/5 rounded; }
-  .prose pre { @apply rounded-md border border-black/10 dark:border-white/10 !bg-black !bg-opacity-90 text-white overflow-x-auto; }
-  .prose code { @apply px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10; }
+  /* Keep Shiki/Content highlight colors, don’t force bg/text on block code */
+  .prose pre { @apply rounded-md border border-black/10 dark:border-white/10 overflow-x-auto; }
+  .prose :not(pre)>code { @apply px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10; }
+  .prose blockquote pre, .prose blockquote code, .prose blockquote :not(pre)>code { @apply not-italic; }
   .prose hr { @apply border-black/10 dark:border-white/10; }
   /* Images should not dictate page width; keep within container */
   .prose img { @apply rounded-md shadow-sm mx-auto max-w-full h-auto; max-height: 480px; object-fit: contain; }

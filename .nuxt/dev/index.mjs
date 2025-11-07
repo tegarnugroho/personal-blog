@@ -677,7 +677,7 @@ const _inlineRuntimeConfig = {
         "headers": {
           "Content-Type": "text/xml; charset=UTF-8",
           "Cache-Control": "public, max-age=600, must-revalidate",
-          "X-Sitemap-Prerendered": "2025-11-07T10:10:09.569Z"
+          "X-Sitemap-Prerendered": "2025-11-07T10:21:11.268Z"
         }
       },
       "/_nuxt/builds/meta/**": {
@@ -784,6 +784,16 @@ const _inlineRuntimeConfig = {
           "default": "github-light",
           "dark": "github-dark"
         },
+        "preload": [
+          "ts",
+          "js",
+          "json",
+          "bash",
+          "html",
+          "css",
+          "vue",
+          "md"
+        ],
         "highlighter": "shiki",
         "shikiEngine": "oniguruma",
         "langs": [
@@ -798,7 +808,15 @@ const _inlineRuntimeConfig = {
           "bash",
           "md",
           "mdc",
-          "yaml"
+          "yaml",
+          "ts",
+          "js",
+          "json",
+          "bash",
+          "html",
+          "css",
+          "vue",
+          "md"
         ]
       },
       "wsUrl": "ws://localhost:4000/",
@@ -817,7 +835,7 @@ const _inlineRuntimeConfig = {
   },
   "content": {
     "cacheVersion": 2,
-    "cacheIntegrity": "oVbTg6fo6D",
+    "cacheIntegrity": "K00zTO6CrO",
     "transformers": [],
     "base": "",
     "api": {
@@ -845,6 +863,16 @@ const _inlineRuntimeConfig = {
         "default": "github-light",
         "dark": "github-dark"
       },
+      "preload": [
+        "ts",
+        "js",
+        "json",
+        "bash",
+        "html",
+        "css",
+        "vue",
+        "md"
+      ],
       "highlighter": "shiki",
       "shikiEngine": "oniguruma",
       "langs": [
@@ -859,7 +887,15 @@ const _inlineRuntimeConfig = {
         "bash",
         "md",
         "mdc",
-        "yaml"
+        "yaml",
+        "ts",
+        "js",
+        "json",
+        "bash",
+        "html",
+        "css",
+        "vue",
+        "md"
       ]
     },
     "markdown": {
