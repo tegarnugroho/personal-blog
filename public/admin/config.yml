@@ -2,7 +2,7 @@ local_backend: true
 
 backend:
   name: github
-  repo: tegaranugroho/blog-repo
+  repo: tegarnugroho/personal-blog
   branch: main
   site_domain: ${SITE_URL}
 

@@ -16,7 +16,7 @@ declare module "#build/content-components.mjs";
 declare module "#build/image-options.mjs";
 declare module "#build/color-mode-options.mjs";
 declare module "#build/devtools/settings.mjs";
-declare module "#build/runtime.vue-devtools-client.AefA7UQ_PkMbqs_Lo_MCJfJnPgqfTsW7QKbe0_rikMY.js";
+declare module "#build/runtime.vue-devtools-client.YHE5YZAAq3cZzY_vRSCWFkKj3KC82nPLkr_lyI4pNUc.js";
 declare module "#build/routes.mjs";
 declare module "#build/pages.mjs";
 declare module "#build/router.options.mjs";
