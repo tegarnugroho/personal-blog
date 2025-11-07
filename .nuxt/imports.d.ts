@@ -30,6 +30,7 @@ export { requestIdleCallback, cancelIdleCallback } from '#app/compat/idle-callba
 export { setInterval } from '#app/compat/interval';
 export { definePageMeta } from '../node_modules/nuxt/dist/pages/runtime/composables';
 export { defineLazyHydrationComponent } from '#app/composables/lazy-hydration';
+export { fetchPostsFromGitHub } from '../utils/github-api';
 export { updateSiteConfig } from '../node_modules/nuxt-site-config/dist/runtime/nuxt/composables/updateSiteConfig';
 export { useNitroOrigin } from '../node_modules/nuxt-site-config/dist/runtime/nuxt/composables/useNitroOrigin';
 export { useSiteConfig } from '../node_modules/nuxt-site-config/dist/runtime/nuxt/composables/useSiteConfig';
